@@ -1,4 +1,5 @@
 const validator = require("validator");
+const url = require("../models/url");
 
 const Url = require("../models/url");
 
@@ -11,6 +12,7 @@ const Redirect = async (req, res) => {
   try {
     const URL = await Url.findOne({ shortCode });
     if (!URL) return res.status(400).json({ msg: "invalid url id" });
+    URL.visits += 1;
     return res.redirect(URL.url);
   } catch (error) {
     console.error(error);
