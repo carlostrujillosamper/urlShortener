@@ -54,24 +54,29 @@ const AddUrl = async (req, res) => {
 
   if (userShortCode) {
     if (!checkShortCodeMinLength(4))
-      return res
-        .status(400)
-        .json({
-          msg: "short code provided must be at least 4 characters long",
-        });
+      return res.status(400).json({
+        msg: "short code provided must be at least 4 characters long",
+      });
     let shortCodeAvailable = await checkShortCodeAvailable(userShortCode, res);
-    if (!shortCodeAvailable) return res.status(400).json({ msg: "short code is not available" })
+    if (!shortCodeAvailable)
+      return res.status(400).json({ msg: "short code is not available" });
   }
 
   try {
     let URL = await Url.findOne({ url });
     if (!URL) {
-      let newURL = new Url({ url : url , shortCode : userShortCode ? userShortCode : generateShortCode(6) });
+      let newURL = new Url({
+        url: url,
+        shortCode: userShortCode ? userShortCode : generateShortCode(6),
+        visits: 0,
+      });
       await newURL.save();
       return res.status(201).json({ shortCode: newURL.shortCode, url });
     }
 
-    return res.status(200).json({ shortCode: URL.shortCode, url });
+    return res
+      .status(200)
+      .json({ msg: "url already in database", shortCode: URL.shortCode, url });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "some error occured" });
