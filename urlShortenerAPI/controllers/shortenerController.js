@@ -8,9 +8,9 @@ const redirect = async (req, res) => {
     return res.status(400).json({ msg: "short code not provided" });
 
   try {
-    const URL = await Url.findOne({ shortCode });
+    
+    const URL = await Url.findOneAndUpdate({ shortCode }, {$inc: {visits: 1}});
     if (!URL) return res.status(400).json({ msg: "invalid url id" });
-    URL.visits += 1;
     console.log(URL);
     return res.redirect(URL.url);
   } catch (error) {
@@ -96,7 +96,13 @@ const getStats = async (req, res) => {
 
     return res
       .status(200)
-      .json({  shortCode: URL.shortCode, ur: URL.url , registered: URL.createdAt , lastAccess : URL.updatedAt , visits: URL.visits});
+      .json({
+        shortCode: URL.shortCode,
+        ur: URL.url,
+        registered: URL.createdAt,
+        lastAccess: URL.updatedAt,
+        visits: URL.visits,
+      });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "some error occured" });
