@@ -1,15 +1,15 @@
 const express = require("express");
 
-const { Redirect, AddUrl } = require("../controller/ShortenerController");
+const { redirect, addUrl, getStats } = require("../controllers/shortenerController");
 
 const router = express.Router();
 
 // / GET
-router.get("/:shortcode", Redirect);
+router.get("/:shortCode", redirect);
 
-router.get("/:shortcode/stats");
+router.get("/:shortCode/stats", getStats);
 
 // / POST
-router.post("/", AddUrl);
+router.post("/", addUrl);
 
 module.exports = router;

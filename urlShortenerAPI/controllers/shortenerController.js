@@ -1,9 +1,7 @@
 const validator = require("validator");
-const url = require("../models/url");
-
 const Url = require("../models/url");
 
-const Redirect = async (req, res) => {
+const redirect = async (req, res) => {
   const { shortCode } = req.params;
 
   if (!shortCode)
@@ -13,6 +11,7 @@ const Redirect = async (req, res) => {
     const URL = await Url.findOne({ shortCode });
     if (!URL) return res.status(400).json({ msg: "invalid url id" });
     URL.visits += 1;
+    console.log(URL);
     return res.redirect(URL.url);
   } catch (error) {
     console.error(error);
@@ -42,7 +41,7 @@ const checkShortCodeMinLength = (shortCode, minLength) => {
   return shortCode.length >= minLength;
 };
 
-const AddUrl = async (req, res) => {
+const addUrl = async (req, res) => {
   const { url, userShortCode } = req.body;
 
   if (!url) return res.status(400).json({ msg: "url not provided" });
@@ -55,7 +54,7 @@ const AddUrl = async (req, res) => {
     return res.status(400).json({ msg: "invalid url" });
 
   if (userShortCode) {
-    if (!checkShortCodeMinLength(4))
+    if (!checkShortCodeMinLength(userShortCode, 4))
       return res.status(400).json({
         msg: "short code provided must be at least 4 characters long",
       });
@@ -85,7 +84,27 @@ const AddUrl = async (req, res) => {
   }
 };
 
+const getStats = async (req, res) => {
+  const { shortCode } = req.params;
+
+  if (!shortCode)
+    return res.status(400).json({ msg: "short code not provided" });
+
+  try {
+    const URL = await Url.findOne({ shortCode });
+    if (!URL) return res.status(400).json({ msg: "invalid url id" });
+
+    return res
+      .status(200)
+      .json({  shortCode: URL.shortCode, ur: URL.url , registered: URL.createdAt , lastAccess : URL.updatedAt , visits: URL.visits});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: "some error occured" });
+  }
+};
+
 module.exports = {
-  Redirect,
-  AddUrl,
+  redirect,
+  addUrl,
+  getStats,
 };
