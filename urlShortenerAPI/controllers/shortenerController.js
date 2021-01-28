@@ -11,7 +11,6 @@ const redirect = async (req, res) => {
     
     const URL = await Url.findOneAndUpdate({ shortCode }, {$inc: {visits: 1}});
     if (!URL) return res.status(400).json({ msg: "invalid url id" });
-    console.log(URL);
     return res.redirect(URL.url);
   } catch (error) {
     console.error(error);
@@ -76,8 +75,8 @@ const addUrl = async (req, res) => {
     }
 
     return res
-      .status(200)
-      .json({ msg: "url already in database", shortCode: URL.shortCode, url });
+      .status(409)
+      .json({ msg: "url already in database"});
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "some error occured" });
@@ -98,7 +97,7 @@ const getStats = async (req, res) => {
       .status(200)
       .json({
         shortCode: URL.shortCode,
-        ur: URL.url,
+        url: URL.url,
         registered: URL.createdAt,
         lastAccess: URL.updatedAt,
         visits: URL.visits,
