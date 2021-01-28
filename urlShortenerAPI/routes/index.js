@@ -1,9 +1,15 @@
-var express = require('express');
-var router = express.Router();
+const express = require("express");
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+const { Redirect, AddUrl } = require("../controller/ShortenerController");
+
+const router = express.Router();
+
+// / GET
+router.get("/:shortcode", Redirect);
+
+router.get("/:shortcode/stats");
+
+// / POST
+router.post("/", AddUrl);
 
 module.exports = router;
